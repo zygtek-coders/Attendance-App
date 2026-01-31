@@ -52,3 +52,10 @@ The admin dashboard displays:
 
 ## 📂 Project Structure
 
+Attendance-App/
+│
+├── app.py               # Main Flask application
+├── static/             # CSS, JS, and images
+├── templates/          # HTML templates
+├── users/              # Folder-based user storage
+└── README.md            # Project 
