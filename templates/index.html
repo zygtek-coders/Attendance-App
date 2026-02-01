@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Attendance</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; text-align: center; }
+        video { border: 3px solid #333; width: 320px; }
+        ul { list-style: none; padding: 0; }
+    </style>
+</head>
+<body>
+
+<h2>📸 Attendance System</h2>
+
+<!-- CAMERA -->
+<video id="video" autoplay></video>
+<br><br>
+<button onclick="capture()">Scan Face</button>
+
+<!-- UPLOAD NEW PERSON -->
+<h3>Add New Attendee</h3>
+<input type="text" id="name" placeholder="Full name"><br>
+<input type="file" id="photo"><br>
+<button onclick="upload()">Save</button>
+
+<!-- PRESENT LIST -->
+<h3>✅ Present Today</h3>
+<ul id="present"></ul>
+
+<script>
+const video = document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream);
+
+function capture() {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    fetch("/recognize", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ image: canvas.toDataURL("image/jpeg") })
+    })
+    .then(r => r.json())
+    .then(data => {
+        const ul = document.getElementById("present");
+        ul.innerHTML = "";
+        data.present_today.forEach(n => {
+            ul.innerHTML += `<li>✔ ${n}</li>`;
+        });
+    });
+}
+
+function upload() {
+    const fd = new FormData();
+    fd.append("name", document.getElementById("name").value);
+    fd.append("photo", document.getElementById("photo").files[0]);
+
+    fetch("/upload", { method: "POST", body: fd })
+    .then(r => r.json())
+    .then(d => alert("Saved: " + d.name));
+}
+</script>
+
+</body>
+</html>

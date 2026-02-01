@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+
+
+  <div class="container">
+    <div class="card">
+<!--         box-shadow:10px 10px 10px rgba(0,0,0,.4);-->
+        <img style="margin-bottom:1;margin-top:15;" src="{{ url_for('static', filename='images/Z.png') }}" width="90" height="70",alt="logo">
+
+      <h5 class="subtitle">Please enter your details</h5>
+      <h1 class="title">Welcome back</h1>
+
+      <form>
+        <input type="email" placeholder="Email address" required />
+        <input type="password" placeholder="Password" required />
+
+        <div class="options">
+          <label for="line" class="remember">
+            <input style="width: 20px; margin-top: 14px;" type="checkbox" name="line" />
+            <p style="padding: left 0px;;">Remember for 30 days</p>
+            <a href="#">Forgot password</a>
+          </label>
+
+        </div>
+
+        <button class="btn primary">Sign in</button>
+
+        <button class="btn google">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="">
+          Sign in with Google
+        </button>
+
+        <p class="footer">
+          Don’t have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+        </p>
+          <button id="themeBtn" class="theme-btn">Dark mode</button>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+</body>
+</html>
