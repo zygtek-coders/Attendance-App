@@ -1,35 +1,51 @@
+"""
+U_D=user_directory
+USR=user
+"""
+
 from flask import Flask, render_template, request, redirect, url_for, session
-import os, json
+import os, json, sys
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "hackathon_secret"
 
-BASE_DIR = "users"
-os.makedirs(BASE_DIR, exist_ok=True)
+USERS = "users"
+os.makedirs(USERS, exist_ok=True)
+
+# ---------------- UPDATE SERVER ----------------
+@app.route("/rst")
+def reload():
+    """  This funct will restart this server app once called  """
+    py=sys.executable
+    print(py, *sys.argv)
+
+    os.execv(py,  *sys.argv)
 
 # ---------------- SIGN UP ----------------
-@app.route("/", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
+    print()
     if request.method == "POST":
+        print(f"From client: {request.form}")
         name = request.form["name"].strip().lower()
         email = request.form["email"]
         password = request.form["password"]
         photo = request.files["photo"]
 
-        user_dir = os.path.join(BASE_DIR, name)
+        U_D = os.path.join(USERS, name)
 
-        if os.path.exists(user_dir):
+        if os.path.exists(U_D):
             return render_template(
                 "signup.html",
                 error="User already exists. Choose a different name."
             )
 
-        os.makedirs(user_dir)
+        os.makedirs(U_D)
 
         # Save photo
-        photo_path = os.path.join(user_dir, secure_filename(photo.filename))
+        photo_path = os.path.join(U_D, secure_filename(photo.filename))
         photo.save(photo_path)
 
         # Save info
@@ -40,11 +56,11 @@ def signup():
             "join_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        with open(os.path.join(user_dir, "info.json"), "w") as f:
-            json.dump(info, f)
+        with open(os.path.join(U_D, "info.json"), "w") as ff:
+            json.dump(info, ff)
 
-        with open(os.path.join(user_dir, "status.txt"), "w") as f:
-            f.write("signed_up")
+        with open(os.path.join(U_D, "status.txt"), "w") as fl:
+            fl.write("signed_up")
 
         return redirect(url_for("login"))
 
@@ -52,25 +68,26 @@ def signup():
 
 
 # ---------------- LOGIN ----------------
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])  # login     FREDDY
 def login():
+    print("Login 2")
     if request.method == "POST":
         name = request.form["name"].strip().lower()
         password = request.form["password"]
 
-        user_dir = os.path.join(BASE_DIR, name)
+        U_D = os.path.join(USERS, name)
 
-        if not os.path.exists(user_dir):
+        if not os.path.exists(U_D):
             return render_template("login.html", error="User not found")
 
-        with open(os.path.join(user_dir, "info.json")) as f:
+        with open(os.path.join(U_D, "info.json")) as f:
             info = json.load(f)
 
         if info["password"] != password:
             return render_template("login.html", error="Wrong password")
 
         # Mark as watching
-        with open(os.path.join(user_dir, "status.txt"), "w") as f:
+        with open(os.path.join(U_D, "status.txt"), "w") as f:
             f.write("watching")
 
         session["user"] = name
@@ -79,31 +96,32 @@ def login():
     return render_template("login.html")
 
 
-# ---------------- VIDEO ----------------
+# ---------------- VIDEO ---------------- ME
 @app.route("/video")
 def video():
+    print("Start watching...")
     if "user" not in session:
         return redirect(url_for("login"))
 
     return render_template("video.html")
 
 
-# ---------------- ADMIN ----------------
+# ---------------- ADMIN ---------------- CERAPHIN
 @app.route("/admin")
 def admin():
     users = []
 
-    for name in os.listdir(BASE_DIR):
-        user_dir = os.path.join(BASE_DIR, name)
+    for name in os.listdir(USERS):
+        U_D = os.path.join(USERS, name)
 
-        with open(os.path.join(user_dir, "info.json")) as f:
+        with open(os.path.join(U_D, "info.json")) as f:
             info = json.load(f)
 
-        with open(os.path.join(user_dir, "status.txt")) as f:
+        with open(os.path.join(U_D, "status.txt")) as f:
             status = f.read()
 
         photo = next(
-            (file for file in os.listdir(user_dir) if file.endswith((".jpg", ".png"))),
+            (file for file in os.listdir(U_D) if file.endswith((".jpg", ".png"))),
             None
         )
 
@@ -111,19 +129,20 @@ def admin():
             "name": name,
             "join_time": info["join_time"],
             "status": status,
-            "photo": f"/{user_dir}/{photo}"
+            "photo": f"/{U_D}/{photo}"
         })
 
     return render_template("admin.html", users=users)
 
 
-# ---------------- LOGOUT ----------------
+# ---------------- LOGOUT -------DO WE REALLY NEED THIS  ?  ---------
 @app.route("/logout")
 def logout():
-    user = session.get("user")
+    print(session)
+    USR = session.get("user")
 
-    if user:
-        with open(os.path.join(BASE_DIR, user, "status.txt"), "w") as f:
+    if USR:
+        with open(os.path.join(USERS, USR, "status.txt"), "w") as f:
             f.write("left")
 
     session.clear()
