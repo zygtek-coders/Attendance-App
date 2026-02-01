@@ -1,0 +1,165 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f5f7fb;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.subtitle {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+form input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.options {
+  /* display: flex; */
+  justify-content:space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 20px;
+  /* margin-top: 20px; */
+
+}
+
+.options a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+/* .remember input {
+    transform: translateY(2px);
+} */
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.btn.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn.google {
+  background: white;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn.google img {
+  width: 18px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+
+.theme-btn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+body.dark {
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+body.dark .card {
+  background: #020617;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+body.dark input {
+  background: #020617;
+  color: white;
+  border: 1px solid #334155;
+}
+
+body.dark input::placeholder {
+  color: #94a3b8;
+}
+
+body.dark .subtitle {
+  color: #94a3b8;
+}
+
+body.dark .options a,
+body.dark .footer a {
+  color: #60a5fa;
+}
+
+body.dark .btn.google {
+  background: #020617;
+  border-color: #334155;
+  color: white;
+}
+
+body.dark .theme-btn {
+  border-color: #334155;
+  color: white;
+}
+
