@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import os, json, sys
 from datetime import datetime
 from werkzeug.utils import secure_filename
-
+from pathlib import Path
 from flask import send_from_directory
 
 
@@ -64,6 +64,12 @@ def signup():
         # Save photo
         photo_path = os.path.join(U_D, secure_filename(photo.filename))
         photo.save(photo_path)
+
+        pic=open(photo_path,"rb").read()
+        ext=Path(photo_path).suffix
+        open(f"static/images/{name}{ext}","wb").write(pic)
+
+        print(f"static/images/{name}{ext}")
 
         # Save info
         info = {
@@ -124,20 +130,17 @@ def login():
     return render_template("login.html")
 
 
-import os
-
-VIDIR = "videos"
-
 @app.route("/video/<current_video>")
 @app.route("/video", defaults={'current_video': None})
 def video(current_video):
+    print(current_video)
     if "user" not in session:
         return redirect(url_for("login"))
 
     # Get all videos in videos folder
     videos = sorted(os.listdir(VIDIR))
     # Filter to only mp4 (or add .mov/.webm if needed)
-    videos = [v for v in videos if v.endswith(".mp4")]
+    videos = [v for v in videos]  #   if v.endswith(".mp4")
 
     if not videos:
         return "No videos available"
@@ -145,11 +148,12 @@ def video(current_video):
     # If no current_video is specified, play the first
     if current_video not in videos:
         current_video = videos[0]
+    print(f"curent: {current_video}, {videos}")
 
     # Count watchers
     watchers = count_watchers()
 
-    # Determine next video
+    # Determiner la video suivante
     try:
         current_index = videos.index(current_video)
         next_video = videos[(current_index + 1) % len(videos)]
@@ -164,9 +168,6 @@ def video(current_video):
         watchers=watchers
     )
 
-
-
-
 @app.route("/stream/<filename>")
 def stream_video(filename):
     return send_from_directory(
@@ -174,7 +175,6 @@ def stream_video(filename):
         filename,
         as_attachment=False     # we need chunks
     )
-
 
 
 
@@ -210,11 +210,18 @@ def admin():
         if info["join_time"].startswith(current_month):
             new_this_month += 1
 
+        # photo = None
+        # for file in os.listdir(user_dir):
+        #     if file.lower().endswith((".jpg", ".png", ".jpeg")):
+        #         photo = f"/{user_dir}/{file}"
+        #         break
+
         photo = None
-        for file in os.listdir(user_dir):
+        for file in os.listdir("static/images/"):
             if file.lower().endswith((".jpg", ".png", ".jpeg")):
-                photo = f"/{user_dir}/{file}"
-                break
+                if info["name"] in file:
+                    photo = "images/"+file #f"/{user_dir}/{file}"
+                    break
 
         users.append({
             "name": info["name"],
@@ -223,6 +230,7 @@ def admin():
             "status": status,
             "photo": photo
         })
+        print(f"users: {users}")
 
     return render_template(
         "admin.html",
@@ -246,6 +254,23 @@ def logout():
 
     session.clear()
     return redirect(url_for("login"))
+
+@app.route("/users")
+def users():
+    watchers = []
+
+    for name in os.listdir(USERS):
+        status_file = os.path.join(USERS, name, "status.txt")
+        if os.path.exists(status_file):
+            with open(status_file) as f:
+                if f.read().strip() == "watching":
+                    watchers.append(name)
+
+    return {
+        "count": len(watchers),
+        "watchers": watchers
+    }
+
 
 
 if __name__ == "__main__":
