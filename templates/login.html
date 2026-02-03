@@ -18,9 +18,13 @@
       <h5 class="subtitle">Please enter your details</h5>
       <h1 class="title">Welcome back</h1>
 
-      <form>
-        <input type="email" placeholder="Email address" required />
-        <input type="password" placeholder="Password" required />
+      <form method="POST" action="{{ url_for('login') }}">
+
+          <input type="text" name="name" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+
+
+
 
         <div class="options">
           <label for="line" class="remember">
@@ -31,9 +35,9 @@
 
         </div>
 
-        <button class="btn primary">Sign in</button>
+        <button type="submit" class="btn primary">Sign in</button>
 
-        <button class="btn google">
+        <button type="button" class="btn google">
           <img src="https://developers.google.com/identity/images/g-logo.png" alt="">
           Sign in with Google
         </button>

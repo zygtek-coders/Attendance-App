@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StreamFlow — Admin Dashboard</title>
+  
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashb.css') }}">
+</head>
+<body data-theme="light">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden>
+        <!-- simple logo -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="4" fill="white" opacity="0.06"/>
+          <path d="M7 8.5v7l5-3.5L7 8.5zM14 8v7h2V8h-2z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <h1>StreamFlow Admin</h1>
+        <div class="muted">Video streaming platform dashboard</div>
+      </div>
+    </div>
+<!-- Right side of the navigation bar -->
+    <div class="top-actions">
+      <div class="muted">Welcome, Admin</div>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input id="themeToggle" type="checkbox" />
+        <small class="muted">Dark mode</small>
+      </label>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- admin information -->
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile">
+        <img src="https://images.unsplash.com/photo-1545996124-1c91d0c7826f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=40" alt="admin"/>
+        <div class="who">
+          <div style="font-weight:600">Administrator</div>
+          <div class="muted">streamflow@studio</div>
+        </div>
+      </div>
+
+      <div class="chip">
+        <h3>Filters & Navigation</h3>
+    </div>
+
+      <div class="filter-section">
+        <h3>Search</h3>
+        <div class="control"><input id="search" type="text" placeholder="Search by name, email, address"/></div>
+
+        <h3>Gender</h3>
+        <div class="control">
+          <select id="genderFilter">
+            <option value="">All</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <h3>Registered</h3>
+        <div class="control">
+          <input id="fromDate" type="date" />
+          <input id="toDate" type="date" />
+        </div>
+
+        <h3>Sort By</h3>
+        <div class="control">
+          <select id="sortBy">
+            <option value="newest">Newest register</option>
+            <option value="oldest">Oldest register</option>
+            <option value="timein">Time In (asc)</option>
+            <option value="timeout">Time Out (asc)</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" id="apply">Apply</button>
+          <button class="ghost small" id="clear">Clear</button>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid rgba(15,23,42,0.04)"/>
+
+        <h3>Navigation</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="small ghost" onclick="viewAll()">All Users</button>
+          <button class="small ghost" onclick="viewActive()">Active Now</button>
+          <button class="small ghost" onclick="viewRecent()">Recently Registered</button>
+          <button class="small ghost" onclick="viewByGender('female')">Female</button>
+          <button class="small ghost" onclick="viewByGender('male')">Male</button>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid rgba(15,23,42,0.04)"/>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="reportBtn">Generate Report</button>
+          <button class="ghost" id="refreshBtn">Refresh</button>
+        </div>
+
+      </div>
+
+    </aside>
+<!-- main page -->
+    <main class="main">
+      <div class="controls">
+        <div class="stats">
+            <!-- Total card -->
+          <div class="stat-card">
+            <div style="font-size:12px" class="muted">Total Users</div>
+            <div style="font-size:18px;font-weight:700" id="totalUsers">-</div>
+          </div>
+          <!-- Active now card -->
+          <div class="stat-card">
+            <div style="font-size:12px" class="muted">Active Now</div>
+            <div style="font-size:18px;font-weight:700" id="activeNow">-</div>
+          </div>
+          <!-- New users card -->
+          <div class="stat-card">
+            <div style="font-size:12px" class="muted">New This Month</div>
+            <div style="font-size:18px;font-weight:700" id="newMonth">-</div>
+          </div>
+        </div>
+        <!-- right card secion -->
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <input id="quickSearch" type="text" placeholder="Quick search by name" style="padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06)" />
+          <button class="ghost small" id="bulkDelete">Bulk delete</button>
+        </div>
+      </div>
+      <!-- dashboard header -->
+      <section>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <h2 style="margin:0">Users</h2>
+          <div class="muted">Manage platform users and exported reports</div>
+
+          <!-- change the dashboad -->
+           <label style="display:flex;align-items:center;gap:8px">
+        <input id="displayToggle" type="checkbox" />
+        <small class="muted">Change display</small>
+      </label>
+        </div>
+        <!-- table display -->
+          <section class="table-card" id="table-view" style="display: none" >
+      <h2 style="margin-top:0">Registered Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Date Registered</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable" >
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </section>
+        
+
+        <div class="grid" id="usersGrid">
+          <!-- user cards go here -->
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <div class="muted">© <strong>StreamFlow</strong> — Admin dashboard</div>
+      <div class="muted">Design: Creative • Data live-sync enabled</div>
+    </div>
+  </footer>
+
+  <!-- modal -->
+  <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal" id="modalContent">
+      <h3 id="modalTitle">Confirm</h3>
+      <p id="modalBody">Are you sure?</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+        <button class="ghost small" onclick="closeModal()">Cancel</button>
+        <button class="btn" id="confirmAction">Yes, proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/dashb.js') }}"></script>
+</body>
+</html>
