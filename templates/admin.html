@@ -4,10 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>StreamFlow — Admin Dashboard</title>
-  
+
    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashb.css') }}">
+
+
+    <script>
+            let lastCount = {{ watchers }};
+
+            setInterval(() => {
+              fetch('/users')
+                .then(res => res.json())
+                .then(data => {
+                  // update number on page
+                  document.getElementById("watchers-count").innerText = data.count;
+
+                  // detect new user
+                  if (data.count > lastCount) {
+                    console.log("New watcher joined!");
+                  }
+
+                  lastCount = data.count;
+                });
+            }, 1000);
+    </script>
+
+
 </head>
-<body data-theme="light">
+<body data-theme="dark">
   <div class="topbar">
     <div class="brand">
       <div class="logo" aria-hidden>
@@ -18,15 +41,15 @@
         </svg>
       </div>
       <div>
-        <h1>StreamFlow Admin</h1>
-        <div class="muted">Video streaming platform dashboard</div>
+        <h1>ZygTek Coders</h1>
+        <div class="muted">Let's watch togather</div>
       </div>
     </div>
 <!-- Right side of the navigation bar -->
     <div class="top-actions">
       <div class="muted">Welcome, Admin</div>
       <label style="display:flex;align-items:center;gap:8px">
-        <input id="themeToggle" type="checkbox" />
+        <input id="themeToggle" type="checkbox" value="true" />
         <small class="muted">Dark mode</small>
       </label>
     </div>
@@ -36,10 +59,10 @@
     <!-- admin information -->
     <aside class="sidebar" aria-label="Sidebar">
       <div class="profile">
-        <img src="https://images.unsplash.com/photo-1545996124-1c91d0c7826f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=40" alt="admin"/>
+        <img src="https://cdn-images-1.medium.com/v2/resize:fit:1200/1*Y3cwWPyJ7NCyc4b9L8jj2Q.png" alt="admin"/>
         <div class="who">
-          <div style="font-weight:600">Administrator</div>
-          <div class="muted">streamflow@studio</div>
+          <div style="font-weight:600">Code blossom</div>
+          <div class="muted">stream@sblossom</div>
         </div>
       </div>
 
@@ -107,21 +130,36 @@
     <main class="main">
       <div class="controls">
         <div class="stats">
+            <div class="stat-card">
+              <div style="font-size:12px" class="muted">Total Users</div>
+              <div style="font-size:18px;font-weight:700">{{ total_users }}</div>
+            </div>
+
+            <div class="stat-card">
+              <div style="font-size:12px" class="muted">Active Now</div>
+              <div style="font-size:18px;font-weight:700">{{ active_now }}</div>
+            </div>
+
+            <div class="stat-card">
+              <div style="font-size:12px" class="muted">New This Month</div>
+              <div id="watchers-count" style="font-size:18px;font-weight:700">{{ new_month }}</div>
+            </div>
+
             <!-- Total card -->
-          <div class="stat-card">
-            <div style="font-size:12px" class="muted">Total Users</div>
-            <div style="font-size:18px;font-weight:700" id="totalUsers">-</div>
-          </div>
-          <!-- Active now card -->
-          <div class="stat-card">
-            <div style="font-size:12px" class="muted">Active Now</div>
-            <div style="font-size:18px;font-weight:700" id="activeNow">-</div>
-          </div>
-          <!-- New users card -->
-          <div class="stat-card">
-            <div style="font-size:12px" class="muted">New This Month</div>
-            <div style="font-size:18px;font-weight:700" id="newMonth">-</div>
-          </div>
+<!--          <div class="stat-card">-->
+<!--            <div style="font-size:12px" class="muted">Total Users</div>-->
+<!--            <div style="font-size:18px;font-weight:700" id="totalUsers">-</div>-->
+<!--          </div>-->
+<!--          &lt;!&ndash; Active now card &ndash;&gt;-->
+<!--          <div class="stat-card">-->
+<!--            <div style="font-size:12px" class="muted">Active Now</div>-->
+<!--            <div style="font-size:18px;font-weight:700" id="activeNow">-</div>-->
+<!--          </div>-->
+<!--          &lt;!&ndash; New users card &ndash;&gt;-->
+<!--          <div class="stat-card">-->
+<!--            <div style="font-size:12px" class="muted">New This Month</div>-->
+<!--            <div style="font-size:18px;font-weight:700" id="newMonth">-</div>-->
+<!--          </div>-->
         </div>
         <!-- right card secion -->
         <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
@@ -163,10 +201,27 @@
         </tbody>
       </table>
     </section>
-        
+
 
         <div class="grid" id="usersGrid">
           <!-- user cards go here -->
+            {% for user in users %}
+              <div class="user-card">
+                <img src="{{ url_for('static', filename=user.photo) }}" width="100" height="100" alt="photo">
+<!--                  <img src="{{ user.photo or 'https://via.placeholder.com/80' }}" alt="photo">-->
+                <h5>{{ user.name }}</h5>
+                <p class="muted">{{ user.email }}</p>
+                <p>
+                  Status:
+                  <strong style="color: {{ 'green' if user.status == 'watching' else 'gray' }}">
+                    {{ user.status }}
+                  </strong>
+                </p>
+                <small>Joined: {{ user.join_time }}</small>
+              </div>
+            {% endfor %}
+
+            <!--            end  -->
         </div>
 
       </section>
